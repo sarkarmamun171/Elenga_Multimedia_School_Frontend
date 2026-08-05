@@ -1,4 +1,23 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
+
+
 function Login() {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    });
+
+    const handleChange = (e) => {
+    setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+    });
+    };
+
+
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
