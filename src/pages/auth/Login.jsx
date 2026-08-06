@@ -17,6 +17,11 @@ function Login() {
     });
     };
 
+        const handleSubmit = (e) => {
+        e.preventDefault();
+
+        console.log(formData);
+         };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
@@ -32,18 +37,21 @@ function Login() {
           </p>
         </div>
 
-        <form>
+        <form onSubmit={handleSubmit}>
 
           <div className="mb-5">
             <label className="block text-gray-700 mb-2">
               Email
             </label>
 
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           </div>
 
           <div className="mb-6">
@@ -53,6 +61,9 @@ function Login() {
 
             <input
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Enter your password"
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
