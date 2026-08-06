@@ -17,14 +17,13 @@ function Login() {
       });
       };
 
-        const handleSubmit = async (e) => {
+      const handleSubmit = async (e) => {
       e.preventDefault();
 
       try {
 
           const response = await api.post("/login", formData);
 
-          console.log(response.data);
              localStorage.setItem("token", response.data.token);
              localStorage.setItem("user", JSON.stringify(response.data.user));
 
@@ -33,7 +32,7 @@ function Login() {
       } catch (error) {
 
           console.error(error.response?.data);
-
+         alert(error.response?.data?.message || "Login failed");
       }
 };
 
