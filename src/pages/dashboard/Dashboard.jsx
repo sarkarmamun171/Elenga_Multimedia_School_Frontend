@@ -19,7 +19,7 @@ function Dashboard() {
                     },
                 }
             );
-        } finally {
+        } finally {m
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             navigate("/login");
