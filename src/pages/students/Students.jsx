@@ -1,4 +1,34 @@
 function Students(){
+      const students = [
+        {
+            id: 1,
+            name: "Rahim",
+            email: "rahim@gmail.com",
+            className: "Class 6",
+            phone: "017XXXXXXXX",
+        },
+        {
+            id: 2,
+            name: "Karim",
+            email: "karim@gmail.com",
+            className: "Class 7",
+            phone: "018XXXXXXXX",
+        },
+        {
+            id: 3,
+            name: "Hasan",
+            email: "hasan@gmail.com",
+            className: "Class 8",
+            phone: "019XXXXXXXX",
+        },
+        {
+            id: 4,
+            name: "Jamal",
+            email: "jamal@gmail.com",
+            className: "Class 9",
+            phone: "016XXXXXXXX",
+        },
+    ];
     return(
        <div>
         <div className="flex justify-between items-center mb-6">
@@ -24,7 +54,7 @@ function Students(){
         <thead className="bg-gray-100">
             <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
-                    #
+                    ID
                 </th>
 
                 <th className="px-6 py-3 text-left text-sm font-semibold">
@@ -49,65 +79,41 @@ function Students(){
             </tr>
         </thead>
 
-        <tbody>
+<tbody>
 
-            <tr className="border-t">
-                <td className="px-6 py-4">
-                    1
-                </td>
+    {students.map((student) => (
+        <tr key={student.id} className="border-t">
 
-                <td className="px-6 py-4 font-medium">
-                    Rahim
-                </td>
+            <td className="px-6 py-4">
+                {student.id}
+            </td>
 
-                <td className="px-6 py-4 text-gray-500">
-                    rahim@gmail.com
-                </td>
+            <td className="px-6 py-4 font-medium">
+                {student.name}
+            </td>
 
-                <td className="px-6 py-4">
-                    Class 6
-                </td>
+            <td className="px-6 py-4 text-gray-500">
+                {student.email}
+            </td>
 
-                <td className="px-6 py-4">
-                    017XXXXXXXX
-                </td>
+            <td className="px-6 py-4">
+                {student.className}
+            </td>
 
-                <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:underline">
-                        Edit
-                    </button>
-                </td>
-            </tr>
+            <td className="px-6 py-4">
+                {student.phone}
+            </td>
 
-            <tr className="border-t">
-                <td className="px-6 py-4">
-                    2
-                </td>
+            <td className="px-6 py-4">
+                <button className="text-blue-600 hover:underline">
+                    Edit
+                </button>
+            </td>
 
-                <td className="px-6 py-4 font-medium">
-                    Karim
-                </td>
+        </tr>
+    ))}
 
-                <td className="px-6 py-4 text-gray-500">
-                    karim@gmail.com
-                </td>
-
-                <td className="px-6 py-4">
-                    Class 7
-                </td>
-
-                <td className="px-6 py-4">
-                    018XXXXXXXX
-                </td>
-
-                <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:underline">
-                        Edit
-                    </button>
-                </td>
-            </tr>
-
-        </tbody>
+</tbody>
 
     </table>
 
