@@ -10,6 +10,8 @@ function Students() {
 
     const [showForm, setShowForm] = useState(false);
 
+    const [editingStudent, setEditingStudent] = useState(null);
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -18,11 +20,15 @@ function Students() {
         roll_number: "",
     });
 
+
     // =========================
     // GET Students
     // =========================
+
     const fetchStudents = async () => {
+
         try {
+
             setLoading(true);
             setError("");
 
@@ -57,8 +63,9 @@ function Students() {
 
 
     // =========================
-    // Form Input Change
+    // Input Change
     // =========================
+
     const handleChange = (e) => {
 
         setFormData({
@@ -70,28 +77,93 @@ function Students() {
 
 
     // =========================
-    // Create Student
+    // Open Add Form
     // =========================
+
+    const handleAddStudent = () => {
+
+        setEditingStudent(null);
+
+        setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            class_name: "",
+            roll_number: "",
+        });
+
+        setShowForm(true);
+    };
+
+
+    // =========================
+    // Open Edit Form
+    // =========================
+
+    const handleEdit = (student) => {
+
+        setEditingStudent(student);
+
+        setFormData({
+            name: student.name || "",
+            email: student.email || "",
+            phone: student.phone || "",
+            class_name: student.class_name || "",
+            roll_number: student.roll_number || "",
+        });
+
+        setShowForm(true);
+    };
+
+
+    // =========================
+    // Create / Update
+    // =========================
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         try {
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/students`,
-                formData,
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            if (editingStudent) {
 
-            console.log(response.data);
+                // UPDATE
 
-            // Form reset
+                const response = await axios.put(
+                    `${import.meta.env.VITE_API_URL}/students/${editingStudent.id}`,
+                    formData,
+                    {
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                console.log(response.data);
+
+            } else {
+
+                // CREATE
+
+                const response = await axios.post(
+                    `${import.meta.env.VITE_API_URL}/students`,
+                    formData,
+                    {
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                console.log(response.data);
+            }
+
+
+            // Reset Form
+
             setFormData({
                 name: "",
                 email: "",
@@ -100,22 +172,79 @@ function Students() {
                 roll_number: "",
             });
 
-            // Form close
+            setEditingStudent(null);
+
             setShowForm(false);
 
-            // Refresh students
+            // Refresh table
+
             fetchStudents();
 
         } catch (error) {
 
-            console.error("Create student error:", error);
+            console.error(
+                "Create/Update student error:",
+                error
+            );
 
             if (error.response?.data?.errors) {
-                console.log(error.response.data.errors);
+
+                console.log(
+                    error.response.data.errors
+                );
+
             }
 
-            setError("Failed to create student.");
+            setError(
+                error.response?.data?.message ||
+                "Something went wrong."
+            );
+        }
+    };
 
+
+    // =========================
+    // Delete Student
+    // =========================
+
+    const handleDelete = async (id) => {
+
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this student?"
+        );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+
+            const response = await axios.delete(
+                `${import.meta.env.VITE_API_URL}/students/${id}`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                    },
+                }
+            );
+
+            console.log(response.data);
+
+            // Refresh table
+
+            fetchStudents();
+
+        } catch (error) {
+
+            console.error(
+                "Delete student error:",
+                error
+            );
+
+            setError(
+                error.response?.data?.message ||
+                "Failed to delete student."
+            );
         }
     };
 
@@ -124,6 +253,7 @@ function Students() {
         <div>
 
             {/* ================= Header ================= */}
+
             <div className="flex justify-between items-center mb-6">
 
                 <div>
@@ -140,7 +270,7 @@ function Students() {
 
 
                 <button
-                    onClick={() => setShowForm(true)}
+                    onClick={handleAddStudent}
                     className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
                 >
                     + Add Student
@@ -150,14 +280,17 @@ function Students() {
 
 
             {/* ================= Error ================= */}
+
             {error && (
+
                 <div className="mb-4 rounded-lg bg-red-100 px-4 py-3 text-red-700">
                     {error}
                 </div>
+
             )}
 
 
-            {/* ================= Add Student Form ================= */}
+            {/* ================= Student Form ================= */}
 
             {showForm && (
 
@@ -166,11 +299,20 @@ function Students() {
                     <div className="flex justify-between items-center mb-5">
 
                         <h2 className="text-xl font-semibold">
-                            Add New Student
+
+                            {editingStudent
+                                ? "Edit Student"
+                                : "Add New Student"
+                            }
+
                         </h2>
 
+
                         <button
-                            onClick={() => setShowForm(false)}
+                            onClick={() => {
+                                setShowForm(false);
+                                setEditingStudent(null);
+                            }}
                             className="text-gray-500 hover:text-red-500 text-xl"
                         >
                             ✕
@@ -184,6 +326,7 @@ function Students() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                             {/* Name */}
+
                             <div>
 
                                 <label className="block text-sm font-medium mb-1">
@@ -195,8 +338,7 @@ function Students() {
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    placeholder="Enter student name"
-                                    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2"
                                     required
                                 />
 
@@ -204,6 +346,7 @@ function Students() {
 
 
                             {/* Email */}
+
                             <div>
 
                                 <label className="block text-sm font-medium mb-1">
@@ -215,14 +358,14 @@ function Students() {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder="Enter email"
-                                    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2"
                                 />
 
                             </div>
 
 
                             {/* Phone */}
+
                             <div>
 
                                 <label className="block text-sm font-medium mb-1">
@@ -234,14 +377,14 @@ function Students() {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    placeholder="Enter phone number"
-                                    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2"
                                 />
 
                             </div>
 
 
                             {/* Class */}
+
                             <div>
 
                                 <label className="block text-sm font-medium mb-1">
@@ -253,8 +396,7 @@ function Students() {
                                     name="class_name"
                                     value={formData.class_name}
                                     onChange={handleChange}
-                                    placeholder="Example: Class 6"
-                                    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2"
                                     required
                                 />
 
@@ -262,6 +404,7 @@ function Students() {
 
 
                             {/* Roll Number */}
+
                             <div>
 
                                 <label className="block text-sm font-medium mb-1">
@@ -273,8 +416,7 @@ function Students() {
                                     name="roll_number"
                                     value={formData.roll_number}
                                     onChange={handleChange}
-                                    placeholder="Enter roll number"
-                                    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2"
                                 />
 
                             </div>
@@ -283,12 +425,16 @@ function Students() {
 
 
                         {/* Buttons */}
+
                         <div className="flex justify-end gap-3 mt-6">
 
                             <button
                                 type="button"
-                                onClick={() => setShowForm(false)}
-                                className="px-5 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+                                onClick={() => {
+                                    setShowForm(false);
+                                    setEditingStudent(null);
+                                }}
+                                className="px-5 py-2 rounded-lg border"
                             >
                                 Cancel
                             </button>
@@ -298,7 +444,12 @@ function Students() {
                                 type="submit"
                                 className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
                             >
-                                Save Student
+
+                                {editingStudent
+                                    ? "Update Student"
+                                    : "Save Student"
+                                }
+
                             </button>
 
                         </div>
@@ -335,10 +486,10 @@ function Students() {
                             <th className="px-6 py-3 text-left text-sm font-semibold">
                                 Class
                             </th>
-                            
-                            <th className="px-6 py-3 text-left text-sm font-semibold">
+                                 <th className="px-6 py-3 text-left text-sm font-semibold">
                                 Roll Number
                             </th>
+
 
                             <th className="px-6 py-3 text-left text-sm font-semibold">
                                 Phone
@@ -355,7 +506,6 @@ function Students() {
 
                     <tbody>
 
-                        {/* Loading */}
                         {loading && (
 
                             <tr>
@@ -372,55 +522,70 @@ function Students() {
                         )}
 
 
-                        {/* Students */}
-                        {!loading && students.map((student) => (
+                        {!loading &&
+                            students.map((student) => (
 
-                            <tr
-                                key={student.id}
-                                className="border-t"
-                            >
+                                <tr
+                                    key={student.id}
+                                    className="border-t"
+                                >
 
-                                <td className="px-6 py-4 text-sm">
-                                    {student.id}
-                                </td>
+                                    <td className="px-6 py-4 text-sm">
+                                        {student.id}
+                                    </td>
 
-                                <td className="px-6 py-4 text-sm">
-                                    {student.name}
-                                </td>
+                                    <td className="px-6 py-4 text-sm">
+                                        {student.name}
+                                    </td>
 
-                                <td className="px-6 py-4 text-sm">
-                                    {student.email || "-"}
-                                </td>
+                                    <td className="px-6 py-4 text-sm">
+                                        {student.email || "-"}
+                                    </td>
 
-                                <td className="px-6 py-4 text-sm">
-                                    {student.class_name}
-                                </td>
-                                  <td className="px-6 py-4 text-sm">
-                                    {student.roll_number}
-                                </td>
+                                    <td className="px-6 py-4 text-sm">
+                                        {student.class_name}
+                                    </td>
+                                                                        <td className="px-6 py-4 text-sm">
+                                        {student.roll_number}
+                                    </td>
 
-                                <td className="px-6 py-4 text-sm">
-                                    {student.phone || "-"}
-                                </td>
-
-                                <td className="px-6 py-4 text-sm">
-
-                                    <button className="mr-2 rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600">
-                                        Edit
-                                    </button>
-
-                                    <button className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600">
-                                        Delete
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                        ))}
+                                    <td className="px-6 py-4 text-sm">
+                                        {student.phone || "-"}
+                                    </td>
 
 
-                        {/* No Data */}
+                                    <td className="px-6 py-4 text-sm">
+
+                                        {/* Edit */}
+
+                                        <button
+                                            onClick={() =>
+                                                handleEdit(student)
+                                            }
+                                            className="mr-2 rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+
+
+                                        {/* Delete */}
+
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(student.id)
+                                            }
+                                            className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            ))}
+
+
                         {!loading &&
                             students.length === 0 &&
                             !error && (
